@@ -1,7 +1,7 @@
 use std::convert::TryInto;
 
 #[allow(dead_code)]
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct Registers
 {
 	a: u8, // acc/arg
@@ -14,6 +14,24 @@ pub struct Registers
 	f: u8, // flags
 	sp: u16, // stack pointer
 	pub pc: u16, // program counter
+}
+
+impl Default for Registers {
+    fn default() -> Registers
+    {
+        Registers {
+            a: u8::default(),
+            b: u8::default(),
+            c: u8::default(),
+            d: u8::default(),
+            e: u8::default(),
+            f: u8::default(),
+            h: u8::default(),
+            l: u8::default(),
+            sp: u16::default(),
+            pc: 0x100,
+        }
+    }
 }
 
 impl Registers
