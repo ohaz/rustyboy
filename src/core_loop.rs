@@ -3,10 +3,10 @@ extern crate piston_window;
 
 use piston_window::*;
 
-pub fn draw_loop()
+pub fn draw_loop(window_title: &str)
 {
     let mut window: PistonWindow =
-        WindowSettings::new("rboy", [160, 144])
+        WindowSettings::new(window_title, [160, 144])
         .exit_on_esc(true).build().unwrap();
     while let Some(event) = window.next() {
         window.draw_2d(&event, |context, graphics, _device| {
