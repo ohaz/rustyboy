@@ -17,7 +17,7 @@ fn check_nintendo_logo(logo: &[u8]) -> bool
     {
         if nintendo_logo[index] != logo[index]
         {
-            error!("Logo incorrect @ {index}: {nlogo} == {romlogo}", index=index, nlogo=nintendo_logo[index], romlogo=logo[index]);
+            error!("Logo incorrect @ {index}: {nlogo:#X} == {romlogo:#X}", index=index, nlogo=nintendo_logo[index], romlogo=logo[index]);
             return false;
         }
     }
