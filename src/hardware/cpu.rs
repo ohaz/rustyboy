@@ -28,11 +28,8 @@ fn get_16_bit_value(hardware: &mut super::gameboy::GameBoy, start_index: usize) 
 
 fn jump_absolute_16_bit(hardware: &mut super::gameboy::GameBoy)
 {
-    let l = hardware.memory_map[(hardware.registers.pc + 1) as usize] as u16;
-    let h = (hardware.memory_map[(hardware.registers.pc + 2) as usize] as u16) << 8;
-    let destination: u16 = h + l;
-    hardware.registers.pc = destination;
-    info!("Absolute 16bit jump to {destination:#X}", destination=destination);
+    hardware.registers.pc = get_16_bit_value(hardware, (hardware.registers.pc + 1) as usize);
+    info!("Absolute 16bit jump to {destination:#X}", destination=hardware.registers.pc);
 }
 
 fn disable_interrupts(hardware: &mut super::gameboy::GameBoy)
