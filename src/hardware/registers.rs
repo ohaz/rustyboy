@@ -12,8 +12,8 @@ pub struct Registers
 	h: u8, // addr
 	l: u8, // addr
 	f: u8, // flags
-	sp: u8, // stack pointer
-	pc: u8, // program counter
+	sp: u16, // stack pointer
+	pub pc: u16, // program counter
 }
 
 impl Registers
