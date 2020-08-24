@@ -1,0 +1,11 @@
+[package]
+name = "rboy"
+version = "0.1.0"
+authors = ["Richard Baumann <ohaz@ohaz.engineer>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+piston2d-graphics = "0.36.0"
+piston_window = "0.98.0"
