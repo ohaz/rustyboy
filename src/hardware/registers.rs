@@ -12,7 +12,7 @@ pub struct Registers
 	h: u8, // addr
 	l: u8, // addr
 	f: u8, // flags
-	sp: u16, // stack pointer
+	pub sp: u16, // stack pointer
 	pub pc: u16, // program counter
 }
 
