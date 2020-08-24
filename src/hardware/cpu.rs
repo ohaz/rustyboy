@@ -59,3 +59,58 @@ pub fn step(hardware: &mut GameBoy)
         x => error_unknown_opcode(x, &hardware.registers)
     };
 }
+
+#[cfg(test)]
+mod tests
+{
+    use super::*;
+
+    #[test]
+    fn increment_program_counter_by_5()
+    {
+        let mut gameboy = GameBoy::default();
+        gameboy.registers.pc = 0x1000;
+
+        increment_pc_by(&mut gameboy, 5);
+
+        assert_eq!(0x1005, gameboy.registers.pc);
+    }
+
+    #[test]
+    fn get_16_bit_value_0xcdab_returns_0xabcd()
+    {
+        let mut gameboy = GameBoy::default();
+        gameboy.memory_map[5] = 0xCD;
+        gameboy.memory_map[6] = 0xAB;
+
+        assert_eq!(0xABCD, get_16_bit_value(&mut gameboy, 5));
+    }
+
+    #[test]
+    fn jump_absolute_16_bit_jump_to_0x1234_pc_is_set()
+    {
+        let mut gameboy = GameBoy::default();
+        gameboy.memory_map[5] = 0x34;
+        gameboy.memory_map[6] = 0x12;
+
+        gameboy.registers.pc = 4;
+
+        jump_absolute_16_bit(&mut gameboy);
+
+        assert_eq!(0x1234, gameboy.registers.pc);
+    }
+
+    #[test]
+    fn load_to_sp_0x1234_sp_is_set_and_pc_increased()
+    {
+        let mut gameboy = GameBoy::default();
+        gameboy.memory_map[5] = 0x34;
+        gameboy.memory_map[6] = 0x12;
+
+        gameboy.registers.pc = 4;
+
+        load_to_sp(&mut gameboy);
+
+        assert_eq!(0x1234, gameboy.registers.sp);
+    }
+}
