@@ -174,6 +174,14 @@ mod tests {
     use super::*;
 
     #[test]
+    fn pc_starts_at_0x100()
+    {
+        let registers: Registers = Registers::default();
+
+        assert_eq!(0x100, registers.pc);
+    }
+
+    #[test]
     fn set_a()
     {
         let mut registers: Registers = Registers::default();
