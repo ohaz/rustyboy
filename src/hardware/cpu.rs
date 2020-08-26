@@ -76,6 +76,14 @@ fn save_a_to_ff00_plus_intermediate(hardware: &mut GameBoy)
     increment_pc_by(hardware, 2);
 }
 
+fn load_16bit_intermediate_to_hl(hardware: &mut GameBoy)
+{
+    let value = get_16_bit_value(hardware, (hardware.registers.pc + 1) as usize);
+    hardware.registers.set_hl(value);
+    info!("Setting HL to {value:#X}", value=value);
+    increment_pc_by(hardware, 3);
+}
+
 pub fn step(hardware: &mut GameBoy)
 {
     let opcode = hardware.memory_map[hardware.registers.pc as usize];
@@ -88,6 +96,7 @@ pub fn step(hardware: &mut GameBoy)
         0xEA => save_a_to_address(hardware),
         0x3E => load_8bit_intermediate_to_a(hardware),
         0xE0 => save_a_to_ff00_plus_intermediate(hardware),
+        0x21 => load_16bit_intermediate_to_hl(hardware),
         x => error_unknown_opcode(x, &hardware.registers)
     };
 }
@@ -96,6 +105,19 @@ pub fn step(hardware: &mut GameBoy)
 mod tests
 {
     use super::*;
+
+    #[test]
+    fn load_16bit_intermediate_to_hl_0xffee()
+    {
+        let mut gameboy = GameBoy::default();
+        gameboy.registers.pc = 0x1000;
+        gameboy.memory_map[0x1001] = 0xEE;
+        gameboy.memory_map[0x1002] = 0xFF;
+
+        load_16bit_intermediate_to_hl(&mut gameboy);
+
+        assert_eq!(0xFFEE, gameboy.registers.get_hl());
+    }
 
     #[test]
     fn save_a_to_ff00_plus_intermediate_5_to_ff04()
