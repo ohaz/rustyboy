@@ -51,7 +51,7 @@ pub fn step(hardware: &mut GameBoy)
 {
     let opcode = hardware.memory_map[hardware.registers.pc as usize];
     info!("Parsed opcode: {opcode:#X}", opcode=opcode);
-    match opcode{
+    match opcode {
         0x00 => increment_pc(hardware), // NOP
         0xC3 => jump_absolute_16_bit(hardware),
         0xF3 => disable_interrupts(hardware),
