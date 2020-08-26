@@ -3,7 +3,10 @@
 The memory map is as follows:
 0000 - 3FFF: 16KB ROM Bank 00, Cartridge / ROM is saved here
 4000 - 7FFF: 16KB ROM Bank 01~7F, Cartridge if MBC
-8000 - 9FFF: 8KB Video RAM
+8000 - 9FFF: 8KB Video RAM:
+  * 8000 - 87FF: Tileset 1
+  * 8800 - 9000: Shared content
+  * 9000 - 97FF: Tileset 2
 A000 - BFFF: 8KB External RAM, in cartridge
 C000 - CFFF: 4KB Work RAM, bank 0
 D000 - DFFF: 4KB Work Ram, bank 1~N
