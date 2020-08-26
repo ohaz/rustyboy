@@ -100,6 +100,7 @@ fn return_from_call(hardware: &mut GameBoy)
     hardware.registers.pc = ((pc_higher as u16) << 8) + pc_lower as u16;
     hardware.registers.sp += 2;
     info!("Returning to {pc:#X}", pc=hardware.registers.pc);
+    increment_pc(hardware);
 }
 
 fn copy_l_to_a(hardware: &mut GameBoy)
@@ -158,7 +159,7 @@ mod tests
 
         return_from_call(&mut gameboy);
 
-        assert_eq!(0x5544, gameboy.registers.pc);
+        assert_eq!(0x5545, gameboy.registers.pc);
         assert_eq!(0x2002, gameboy.registers.sp);
     }
 
