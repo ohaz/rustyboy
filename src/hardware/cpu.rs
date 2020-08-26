@@ -84,6 +84,15 @@ fn load_16bit_intermediate_to_hl(hardware: &mut GameBoy)
     increment_pc_by(hardware, 3);
 }
 
+fn call(hardware: &mut GameBoy)
+{
+    hardware.memory_map[(hardware.registers.sp - 1) as usize] = (hardware.registers.pc >> 8) as u8;
+    hardware.memory_map[(hardware.registers.sp - 2) as usize] = ((hardware.registers.pc << 8) >> 8) as u8;
+    hardware.registers.pc = get_16_bit_value(hardware, (hardware.registers.pc + 1) as usize);
+    hardware.registers.sp -= 2;
+    info!("Calling {pc:#X}", pc=hardware.registers.pc);
+}
+
 pub fn step(hardware: &mut GameBoy)
 {
     let opcode = hardware.memory_map[hardware.registers.pc as usize];
@@ -97,6 +106,7 @@ pub fn step(hardware: &mut GameBoy)
         0x3E => load_8bit_intermediate_to_a(hardware),
         0xE0 => save_a_to_ff00_plus_intermediate(hardware),
         0x21 => load_16bit_intermediate_to_hl(hardware),
+        0xCD => call(hardware),
         x => error_unknown_opcode(x, &hardware.registers)
     };
 }
@@ -105,6 +115,24 @@ pub fn step(hardware: &mut GameBoy)
 mod tests
 {
     use super::*;
+
+    #[test]
+    fn call_check_stack_and_pc()
+    {
+        let mut gameboy = GameBoy::default();
+        gameboy.registers.sp = 0x2000;
+        gameboy.registers.pc = 0x1234;
+        gameboy.memory_map[0x1235] = 0x33;
+        gameboy.memory_map[0x1236] = 0x44;
+
+        call(&mut gameboy);
+
+        assert_eq!(0x4433, gameboy.registers.pc);
+        assert_eq!(0x1FFE, gameboy.registers.sp);
+        assert_eq!(0x34, gameboy.memory_map[0x1FFE]);
+        assert_eq!(0x12, gameboy.memory_map[0x1FFF]);
+
+    }
 
     #[test]
     fn load_16bit_intermediate_to_hl_0xffee()
