@@ -112,6 +112,15 @@ fn jump_signed_immediate(hardware: &mut GameBoy)
     info!("Jumped by {jump_size} to {pc:#X}", jump_size=jump_size, pc=hardware.registers.pc);
 }
 
+fn return_from_call(hardware: &mut GameBoy)
+{
+    let pc_lower = hardware.memory_map[hardware.registers.sp as usize];
+    let pc_higher = hardware.memory_map[(hardware.registers.sp + 1) as usize];
+    hardware.registers.pc = ((pc_higher as u16) << 8) + pc_lower as u16;
+    hardware.registers.sp += 2;
+    info!("Returning to {pc:#X}", pc=hardware.registers.pc);
+}
+
 pub fn step(hardware: &mut GameBoy)
 {
     let opcode = hardware.memory_map[hardware.registers.pc as usize];
@@ -129,6 +138,7 @@ pub fn step(hardware: &mut GameBoy)
         0x7D => copy_l_to_a(hardware),
         0x7C => copy_h_to_a(hardware),
         0x18 => jump_signed_immediate(hardware),
+        0xC9 => return_from_call(hardware),
         x => error_unknown_opcode(x, &hardware.registers)
     };
 }
@@ -137,6 +147,20 @@ pub fn step(hardware: &mut GameBoy)
 mod tests
 {
     use super::*;
+
+    #[test]
+    fn return_from_call_to_0x1000()
+    {
+        let mut gameboy = GameBoy::default();
+        gameboy.registers.sp = 0x2000;
+        gameboy.memory_map[0x2000] = 0x44;
+        gameboy.memory_map[0x2001] = 0x55;
+
+        return_from_call(&mut gameboy);
+
+        assert_eq!(0x5544, gameboy.registers.pc);
+        assert_eq!(0x2002, gameboy.registers.sp);
+    }
 
     #[test]
     fn jump_signed_immediate_by_minus5()
