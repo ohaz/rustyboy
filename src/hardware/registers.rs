@@ -4,7 +4,7 @@ use std::convert::TryInto;
 #[derive(Debug)]
 pub struct Registers
 {
-	a: u8, // acc/arg
+	pub a: u8, // acc/arg
 	b: u8,
 	c: u8,
 	d: u8,

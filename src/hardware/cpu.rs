@@ -47,6 +47,14 @@ fn load_to_sp(hardware: &mut GameBoy)
     increment_pc_by(hardware, 3);
 }
 
+fn save_a_to_address(hardware: &mut GameBoy)
+{
+    let location = get_16_bit_value(hardware, (hardware.registers.pc + 1) as usize);
+    hardware.memory_map[location as usize] = hardware.registers.a;
+    info!("Loading register A: {a:#X} into memory[{location:#X}]", a=hardware.registers.a, location=location);
+    increment_pc_by(hardware, 3);
+}
+
 pub fn step(hardware: &mut GameBoy)
 {
     let opcode = hardware.memory_map[hardware.registers.pc as usize];
@@ -56,6 +64,7 @@ pub fn step(hardware: &mut GameBoy)
         0xC3 => jump_absolute_16_bit(hardware),
         0xF3 => disable_interrupts(hardware),
         0x31 => load_to_sp(hardware),
+        0xEA => save_a_to_address(hardware),
         x => error_unknown_opcode(x, &hardware.registers)
     };
 }
@@ -64,6 +73,21 @@ pub fn step(hardware: &mut GameBoy)
 mod tests
 {
     use super::*;
+
+    #[test]
+    fn save_a_to_address_5_to_1234()
+    {
+        let mut gameboy = GameBoy::default();
+        gameboy.registers.a = 5;
+        gameboy.registers.pc = 0x1000;
+
+        gameboy.memory_map[0x1001] = 0x34;
+        gameboy.memory_map[0x1002] = 0x12;
+
+        save_a_to_address(&mut gameboy);
+
+        assert_eq!(0x5, gameboy.memory_map[0x1234]);
+    }
 
     #[test]
     fn increment_program_counter_by_5()
