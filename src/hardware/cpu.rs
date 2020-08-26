@@ -86,8 +86,9 @@ fn load_16bit_intermediate_to_hl(hardware: &mut GameBoy)
 
 fn call(hardware: &mut GameBoy)
 {
-    hardware.memory_map[(hardware.registers.sp - 1) as usize] = (hardware.registers.pc >> 8) as u8;
-    hardware.memory_map[(hardware.registers.sp - 2) as usize] = ((hardware.registers.pc << 8) >> 8) as u8;
+    let post_call_pc = hardware.registers.pc + 3;
+    hardware.memory_map[(hardware.registers.sp - 1) as usize] = (post_call_pc >> 8) as u8;
+    hardware.memory_map[(hardware.registers.sp - 2) as usize] = ((post_call_pc << 8) >> 8) as u8;
     hardware.registers.pc = get_16_bit_value(hardware, (hardware.registers.pc + 1) as usize);
     hardware.registers.sp -= 2;
     info!("Calling {pc:#X}", pc=hardware.registers.pc);
@@ -100,7 +101,6 @@ fn return_from_call(hardware: &mut GameBoy)
     hardware.registers.pc = ((pc_higher as u16) << 8) + pc_lower as u16;
     hardware.registers.sp += 2;
     info!("Returning to {pc:#X}", pc=hardware.registers.pc);
-    increment_pc(hardware);
 }
 
 fn copy_l_to_a(hardware: &mut GameBoy)
@@ -159,7 +159,7 @@ mod tests
 
         return_from_call(&mut gameboy);
 
-        assert_eq!(0x5545, gameboy.registers.pc);
+        assert_eq!(0x5544, gameboy.registers.pc);
         assert_eq!(0x2002, gameboy.registers.sp);
     }
 
@@ -223,7 +223,7 @@ mod tests
 
         assert_eq!(0x4433, gameboy.registers.pc);
         assert_eq!(0x1FFE, gameboy.registers.sp);
-        assert_eq!(0x34, gameboy.memory_map[0x1FFE]);
+        assert_eq!(0x37, gameboy.memory_map[0x1FFE]);
         assert_eq!(0x12, gameboy.memory_map[0x1FFF]);
 
     }
