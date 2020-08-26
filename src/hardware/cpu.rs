@@ -93,6 +93,18 @@ fn call(hardware: &mut GameBoy)
     info!("Calling {pc:#X}", pc=hardware.registers.pc);
 }
 
+fn copy_l_to_a(hardware: &mut GameBoy)
+{
+    hardware.registers.a = hardware.registers.l;
+    increment_pc(hardware);
+}
+
+fn copy_h_to_a(hardware: &mut GameBoy)
+{
+    hardware.registers.a = hardware.registers.h;
+    increment_pc(hardware);
+}
+
 pub fn step(hardware: &mut GameBoy)
 {
     let opcode = hardware.memory_map[hardware.registers.pc as usize];
@@ -107,6 +119,8 @@ pub fn step(hardware: &mut GameBoy)
         0xE0 => save_a_to_ff00_plus_intermediate(hardware),
         0x21 => load_16bit_intermediate_to_hl(hardware),
         0xCD => call(hardware),
+        0x7D => copy_l_to_a(hardware),
+        0x7C => copy_h_to_a(hardware),
         x => error_unknown_opcode(x, &hardware.registers)
     };
 }
@@ -115,6 +129,28 @@ pub fn step(hardware: &mut GameBoy)
 mod tests
 {
     use super::*;
+
+    #[test]
+    fn copy_h_to_a_0xfa()
+    {
+        let mut gameboy = GameBoy::default();
+        gameboy.registers.h = 0xFA;
+
+        copy_h_to_a(&mut gameboy);
+
+        assert_eq!(0xFA, gameboy.registers.a);
+    }
+
+    #[test]
+    fn copy_l_to_a_0xfa()
+    {
+        let mut gameboy = GameBoy::default();
+        gameboy.registers.l = 0xFA;
+
+        copy_l_to_a(&mut gameboy);
+
+        assert_eq!(0xFA, gameboy.registers.a);
+    }
 
     #[test]
     fn call_check_stack_and_pc()
@@ -159,6 +195,7 @@ mod tests
 
         assert_eq!(0x5, gameboy.memory_map[0xff04]);
     }
+
     #[test]
     fn load_8bit_intermediate_to_a_0x34()
     {

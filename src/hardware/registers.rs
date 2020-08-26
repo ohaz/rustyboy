@@ -9,8 +9,8 @@ pub struct Registers
 	c: u8,
 	d: u8,
 	e: u8,
-	h: u8, // addr
-	l: u8, // addr
+	pub h: u8, // addr
+	pub l: u8, // addr
 	f: u8, // flags
 	pub sp: u16, // stack pointer
 	pub pc: u16, // program counter
