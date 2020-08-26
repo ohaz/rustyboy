@@ -93,6 +93,15 @@ fn call(hardware: &mut GameBoy)
     info!("Calling {pc:#X}", pc=hardware.registers.pc);
 }
 
+fn return_from_call(hardware: &mut GameBoy)
+{
+    let pc_lower = hardware.memory_map[hardware.registers.sp as usize];
+    let pc_higher = hardware.memory_map[(hardware.registers.sp + 1) as usize];
+    hardware.registers.pc = ((pc_higher as u16) << 8) + pc_lower as u16;
+    hardware.registers.sp += 2;
+    info!("Returning to {pc:#X}", pc=hardware.registers.pc);
+}
+
 fn copy_l_to_a(hardware: &mut GameBoy)
 {
     hardware.registers.a = hardware.registers.l;
@@ -110,15 +119,6 @@ fn jump_signed_immediate(hardware: &mut GameBoy)
     let jump_size: i8 = get_8_bit_value(hardware, (hardware.registers.pc + 1) as usize) as i8;
     hardware.registers.pc = hardware.registers.pc.wrapping_add(jump_size as u16);
     info!("Jumped by {jump_size} to {pc:#X}", jump_size=jump_size, pc=hardware.registers.pc);
-}
-
-fn return_from_call(hardware: &mut GameBoy)
-{
-    let pc_lower = hardware.memory_map[hardware.registers.sp as usize];
-    let pc_higher = hardware.memory_map[(hardware.registers.sp + 1) as usize];
-    hardware.registers.pc = ((pc_higher as u16) << 8) + pc_lower as u16;
-    hardware.registers.sp += 2;
-    info!("Returning to {pc:#X}", pc=hardware.registers.pc);
 }
 
 pub fn step(hardware: &mut GameBoy)
